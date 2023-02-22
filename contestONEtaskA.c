@@ -3,6 +3,10 @@
 #include "string.h"
 #include "stdlib.h"
 
+
+#define _MAX_LENGTH_OF_REQUEST_ 256
+
+
 struct _Stack {
 	int size;
 	int array[10000];
@@ -66,7 +70,7 @@ int main() {
 	const char* exitString = "exit";
 
 	while (1) {
-		char requests[256];
+		char requests[_MAX_LENGTH_OF_REQUEST_];
 		if (scanf("%s", requests) == 1) {
 
 		}
