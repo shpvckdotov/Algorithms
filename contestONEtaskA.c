@@ -3,8 +3,6 @@
 #include "string.h"
 #include "stdlib.h"
 
-typedef long long ll;
-
 struct _Stack {
 	int size;
 	int array[10000];
@@ -57,7 +55,6 @@ void clear(Stack* stack) {
 	printf("ok\n");
 }
 
-#define true 1;
 int main() {
 	Stack stack;
 	stack.size = 0;
