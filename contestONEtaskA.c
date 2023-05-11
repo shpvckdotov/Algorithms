@@ -1,43 +1,150 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "stdio.h"
-#include "string.h"
 #include "stdlib.h"
+#include "string.h"
 
 
+#define _INITIAL_CAPACITY_ 100
+#define _MAX_ELEMENT_SIZE 1000000
+#define _MAX_ELEMENT_MUL_SIZE 1000000000000
+#define _MAX_STACK_SIZE_ 10000000000
+#define _RESIZE_CONST_ 2
+#define _REALLOC_CONST_ 4
 #define _MAX_LENGTH_OF_REQUEST_ 256
+#define OK 1
+#define ERROR 0
 
+typedef int data;
 
-struct _Stack {
-	int size;
-	int array[10000];
-
+struct Stack {
+	size_t capacity;
+	size_t size;
+	data* array;
 };
 
-typedef struct _Stack Stack;
-
-
-
-
-
-void push(int a, Stack* stack) {
-	stack->size++;
-	stack->array[stack->size - 1] = a;
-	printf("ok\n");
-}
-
-
-
-
-void pop(Stack* stack) {
-	if (stack->size != 0) {
-		printf("%d\n", stack->array[stack->size - 1]);
-		stack->size--;
+struct Stack* stack_ctr(size_t size, size_t element_size) {
+	if (size * element_size > _MAX_ELEMENT_MUL_SIZE) {
+		return NULL;
+	}
+	if (element_size > _MAX_ELEMENT_SIZE) {
+		return NULL;
+	}
+	if (size > _MAX_STACK_SIZE_) {
+		return NULL;
+	}
+	struct Stack* stack;
+	if (size <= _INITIAL_CAPACITY_) {
+		stack = (struct stack*)malloc(sizeof(struct Stack));
+		stack->array = (data*)malloc(_INITIAL_CAPACITY_ * element_size);
+		stack->size = 0;
+		stack->capacity = _INITIAL_CAPACITY_;
+		return stack;
 	}
 	else {
-		printf("error\n");
+		stack = (struct stack*)malloc(sizeof(struct Stack));
+		stack->array = (data*)malloc((size * _RESIZE_CONST_) * element_size);
+		stack->size = 0;
+		stack->capacity = size * _RESIZE_CONST_;
+		return stack;
 	}
 }
 
+int push(struct Stack* st, data* buffer) {
+	if (st == NULL) {
+		return ERROR;
+	}
+	if (isOverflowed(st->capacity, st->size)) {
+		data* tmp;
+		tmp = realloc(st->array, (st->capacity * _RESIZE_CONST_) * sizeof(data));
+		if (tmp == NULL) {
+			return ERROR;
+		}
+		else {
+			st->array = tmp;
+			tmp = NULL;
+			st->array[st->size] = *buffer;
+			st->size++;
+			st->capacity = st->capacity * _RESIZE_CONST_;
+			return OK;
+		}
+	}
+	st->array[st->size] = *buffer;
+	st->size++;
+	return OK;
+}
+
+int top(struct Stack* st, data* buffer) {
+	if (st == NULL) {
+		return ERROR;
+	}
+	if (st->size == 0) {
+		return ERROR;
+	}
+	if (st == NULL) {
+		return ERROR;
+	}
+	*buffer = st->array[st->size - 1];
+	return OK;
+}
+
+int pop(struct Stack* st) {
+	if (st == NULL) {
+		return ERROR;
+	}
+	if (st->size < st->capacity / _REALLOC_CONST_ && st->capacity / _RESIZE_CONST_ < _INITIAL_CAPACITY_) {
+		data* tmp;
+		tmp = realloc(st->array, (_INITIAL_CAPACITY_) * sizeof(data));
+		if (tmp == NULL) {
+			return ERROR;
+		}
+		else {
+			st->array = tmp;
+			tmp = NULL;
+			st->capacity = _INITIAL_CAPACITY_;
+			return OK;
+		}
+	}
+	if (st->size < st->capacity / _REALLOC_CONST_ && st->capacity / _RESIZE_CONST_ > _INITIAL_CAPACITY_) {
+		data* tmp;
+		tmp = realloc(st->array, (st->capacity / _RESIZE_CONST_) * sizeof(data));
+		if (tmp == NULL) {
+			return ERROR;
+		}
+		else {
+			st->array = tmp;
+			tmp = NULL;
+			st->capacity = st->capacity / _RESIZE_CONST_;
+			return OK;
+		}
+	}
+	if (st->size > 0) {
+		st->size--;
+		return OK;
+	}
+	else {
+		return ERROR;
+	}
+}
+
+struct Stack* stack_dtr(struct Stack* st) {
+	if (st == NULL) {
+		return NULL;
+	}
+	free(st->array);
+	free(st);
+	return NULL;
+}
+
+int isOverflowed(size_t capacity, size_t size) {
+	if (capacity <= size) {
+		return OK;
+	}
+	else {
+		return ERROR;
+	}
+}
+
+typedef struct Stack Stack;
 
 void back(Stack* stack) {
 	if (stack->size != 0) {
@@ -48,19 +155,13 @@ void back(Stack* stack) {
 	}
 }
 
-
 void sizeOf(Stack* stack) {
 	printf("%d\n", stack->size);
 }
 
-
-void clear(Stack* stack) {
-	stack->size = 0;
-	printf("ok\n");
-}
-
 int main() {
-	Stack stack;
+	Stack* stack;
+	stack = stack_ctr(1, 4);
 	stack.size = 0;
 	const char* pushString = "push";
 	const char* popString = "pop";
@@ -82,21 +183,25 @@ int main() {
 			if (scanf("%d", &n) == 1) {
 
 			}
-			push(n, &stack);
+			push(n, stack);
 		}
 		if (!strcmp(requests, popString)) {
-			pop(&stack);
+			pop(stack);
 		}
 		if (!strcmp(requests, backString)) {
-			back(&stack);
+			int number;
+			top(stack, &number);
+			printf("%d", number);
 		}
 		if (!strcmp(requests, sizeString)) {
-			sizeOf(&stack);
+			sizeOf(stack);
 		}
 		if (!strcmp(requests, clearString)) {
-			clear(&stack);
+			stack_dtr(stack);
+			printf("ok\n");
 		}
 		if (!strcmp(requests, exitString)) {
+			stack_dtr(stack);
 			printf("bye");
 			return 0;
 		}
