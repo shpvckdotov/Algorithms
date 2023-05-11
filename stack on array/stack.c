@@ -3,13 +3,13 @@
 
 
 struct Stack* stack_ctr(size_t size, size_t element_size) {
-	if (size * element_size > 1000000000000) {
+	if (size * element_size > _MAX_ELEMENT_MUL_SIZE) {
 		return NULL;
 	}
-	if (element_size > 1000000) {
+	if (element_size > _MAX_ELEMENT_SIZE) {
 		return NULL;
 	}
-	if (size > 10000000000) {
+	if (size > _MAX_STACK_SIZE_) {
 		return NULL;
 	}
 	struct Stack* stack;
@@ -22,12 +22,11 @@ struct Stack* stack_ctr(size_t size, size_t element_size) {
 	} 
 	else {
 		stack = (struct stack*)malloc(sizeof(struct Stack));
-		stack->array = (data*)malloc( (size * 2) * element_size);
+		stack->array = (data*)malloc( (size * _RESIZE_CONST_) * element_size);
 		stack->size = 0;
-		stack->capacity = size * 2;
+		stack->capacity = size * _RESIZE_CONST_;
 		return stack;
 	}
-
 }
 
 int push(struct Stack* st, data* buffer) {
@@ -36,7 +35,7 @@ int push(struct Stack* st, data* buffer) {
 	}
 	if (isOverflowed(st->capacity,st->size)) {
 		data* tmp;
-		tmp = realloc(st->array, (st->capacity * 2) * sizeof(data));
+		tmp = realloc(st->array, (st->capacity * _RESIZE_CONST_) * sizeof(data));
 		if (tmp == NULL) {
 			return ERROR;
 		}
@@ -45,7 +44,7 @@ int push(struct Stack* st, data* buffer) {
 			tmp = NULL;
 			st->array[st->size] = *buffer;
 			st->size++;
-			st->capacity = st->capacity * 2;
+			st->capacity = st->capacity * _RESIZE_CONST_;
 			return OK;
 		}
 	}
@@ -72,7 +71,7 @@ int pop(struct Stack* st) {
 	if (st == NULL) {
 		return ERROR;
 	}
-	if (st->size < st->capacity / 4 && st->capacity / 2 < _INITIAL_CAPACITY_) {
+	if (st->size < st->capacity / _REALLOC_CONST_ && st->capacity / _RESIZE_CONST_ < _INITIAL_CAPACITY_) {
 		data* tmp;
 		tmp = realloc(st->array, (_INITIAL_CAPACITY_) * sizeof(data));
 		if (tmp == NULL) {
@@ -85,16 +84,16 @@ int pop(struct Stack* st) {
 			return OK;
 		}
 	}
-	if (st->size < st->capacity / 4 && st->capacity / 2 > _INITIAL_CAPACITY_) {
+	if (st->size < st->capacity / _REALLOC_CONST_ && st->capacity / _RESIZE_CONST_ > _INITIAL_CAPACITY_) {
 		data* tmp;
-		tmp = realloc(st->array, (st->capacity / 2) * sizeof(data));
+		tmp = realloc(st->array, (st->capacity / _RESIZE_CONST_) * sizeof(data));
 		if (tmp == NULL) {
 			return ERROR;
 		}
 		else {
 			st->array = tmp;
 			tmp = NULL;
-			st->capacity = st->capacity / 2;
+			st->capacity = st->capacity / _RESIZE_CONST_;
 			return OK;
 		}
 	}

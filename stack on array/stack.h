@@ -6,6 +6,11 @@
 #include <stddef.h>
 
 #define _INITIAL_CAPACITY_ 100
+#define _MAX_ELEMENT_SIZE 1000000
+#define _MAX_ELEMENT_MUL_SIZE 1000000000000
+#define _MAX_STACK_SIZE_ 10000000000
+#define _RESIZE_CONST_ 2
+#define _REALLOC_CONST_ 4
 
 
 
