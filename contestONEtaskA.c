@@ -41,14 +41,26 @@ struct Stack* stack_ctr(size_t size, size_t element_size) {
 	struct Stack* stack;
 	if (size <= _INITIAL_CAPACITY_) {
 		stack = (struct stack*)malloc(sizeof(struct Stack));
+		if (stack == NULL) {
+			return NULL;
+		}
 		stack->array = (data*)malloc(_INITIAL_CAPACITY_ * element_size);
+		if (stack->array == NULL) {
+			return NULL;
+		}
 		stack->size = 0;
 		stack->capacity = _INITIAL_CAPACITY_;
 		return stack;
 	}
 	else {
 		stack = (struct stack*)malloc(sizeof(struct Stack));
+		if (stack == NULL) {
+
+		}
 		stack->array = (data*)malloc((size * _RESIZE_CONST_) * element_size);
+		if (stack->array == NULL) {
+
+		}
 		stack->size = 0;
 		stack->capacity = size * _RESIZE_CONST_;
 		return stack;
