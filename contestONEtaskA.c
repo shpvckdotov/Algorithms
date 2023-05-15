@@ -14,6 +14,12 @@
 #define OK 1
 #define ERROR 0
 
+const char* pushString = "push";
+const char* popString = "pop";
+const char* backString = "back";
+const char* sizeString = "size";
+const char* clearString = "clear";
+const char* exitString = "exit";
 typedef int data;
 
 struct Stack {
@@ -144,65 +150,56 @@ int isOverflowed(size_t capacity, size_t size) {
 	}
 }
 
-typedef struct Stack Stack;
 
-void back(Stack* stack) {
-	if (stack->size != 0) {
-		printf("%d\n", stack->array[stack->size - 1]);
+int solution(Stack* stack) {
+	char requests[_MAX_LENGTH_OF_REQUEST_];
+	if (scanf("%s", requests) == 1) {
+
 	}
 	else {
-		printf("error\n");
+
+	}
+	if (!strcmp(requests, pushString)) {
+		int n;
+		if (scanf("%d", &n) == 1) {
+
+		}
+		push(n, stack);
+	}
+	if (!strcmp(requests, popString)) {
+		pop(stack);
+	}
+	if (!strcmp(requests, backString)) {
+		int number;
+		top(stack, &number);
+		printf("%d", number);
+	}
+	if (!strcmp(requests, sizeString)) {
+		printf("%d", sizeOf(stack));
+	}
+	if (!strcmp(requests, clearString)) {
+		stack_dtr(stack);
+		printf("ok\n");
+	}
+	if (!strcmp(requests, exitString)) {
+		stack_dtr(stack);
+		printf("bye");
+		return -1;
 	}
 }
 
-void sizeOf(Stack* stack) {
-	printf("%d\n", stack->size);
+typedef struct Stack Stack;
+
+int sizeOf(Stack* stack) {
+	return stack->size;
 }
 
 int main() {
 	Stack* stack;
 	stack = stack_ctr(1, 4);
 	stack.size = 0;
-	const char* pushString = "push";
-	const char* popString = "pop";
-	const char* backString = "back";
-	const char* sizeString = "size";
-	const char* clearString = "clear";
-	const char* exitString = "exit";
-
 	while (1) {
-		char requests[_MAX_LENGTH_OF_REQUEST_];
-		if (scanf("%s", requests) == 1) {
-
-		}
-		else {
-
-		}
-		if (!strcmp(requests, pushString)) {
-			int n;
-			if (scanf("%d", &n) == 1) {
-
-			}
-			push(n, stack);
-		}
-		if (!strcmp(requests, popString)) {
-			pop(stack);
-		}
-		if (!strcmp(requests, backString)) {
-			int number;
-			top(stack, &number);
-			printf("%d", number);
-		}
-		if (!strcmp(requests, sizeString)) {
-			sizeOf(stack);
-		}
-		if (!strcmp(requests, clearString)) {
-			stack_dtr(stack);
-			printf("ok\n");
-		}
-		if (!strcmp(requests, exitString)) {
-			stack_dtr(stack);
-			printf("bye");
+		if (solution(stack) == -1) {
 			return 0;
 		}
 	}
