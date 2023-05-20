@@ -122,27 +122,27 @@ void buildDegs(int* logs, int n){
 }
 
 
-void buildST(int** ST1, int* a, int n, int* logs){
+void buildST(int** sparseTable, int* a, int n, int* logs){
 
     for (int j = 0; j <= logs[n]; j++){
         for (int i = 1; i <= n; i++){
             if (j == 0){
-                ST1[i][j] = a[i];
+                sparseTable[i][j] = a[i];
             }
             else{
                 if (i + (1 << j) - 1 > n){
                     break;
                 }
-                ST1[i][j] = min(ST1[i][j - 1], ST1[i + (1 << (j - 1))][j - 1]);
+                sparseTable[i][j] = min(sparseTable[i][j - 1], sparseTable[i + (1 << (j - 1))][j - 1]);
             }
         }
     }
 }
 
-int getMin(int** ST1, int n, int* logs, int l, int r){
+int getMin(int** sparseTable, int n, int* logs, int l, int r){
     int lo = logs[r - l + 1];
 
-    return min(ST1[l][lo], ST1[r - (1 << lo) + 1][lo]);
+    return min(sparseTable[l][lo], sparseTable[r - (1 << lo) + 1][lo]);
 
 }
 
