@@ -2,7 +2,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
-#include "Segment.h"
 
 #define N_TEST 5
 #define SIZE_TREE 1000000
@@ -106,83 +105,8 @@ double getCPUTime() {
     return -1;      /* Failed. */
 }
 
-void buildTree(long long* a, long long* tree, int i, int t_l, int t_r){
-    if (t_l == t_r) {
-        long long int l = a[t_l];
-        tree[i] = a[t_l];
-        return;
+void buildTree(long long* a, long long* tree, int i, int t_l, int t_r);
 
-    }
+void setTree(long long* tree, int i, int x, int idx, int l, int r);
 
-    int mid = (t_l + t_r) / 2;
-    buildTree(a, tree, 2 * i, t_l, mid);
-    buildTree(a, tree, 2 * i + 1, mid + 1, t_r);
-    tree[i] = tree[2 * i] + tree[2 * i + 1];
-
-}
-
-void setTree(long long* tree, int i, int x, int idx, int l, int r){
-    if (l == r){
-        tree[i] = x;
-        return;
-    }
-    int mid = (l + r) / 2;
-    if (idx <= mid){
-        setTree(tree, 2 * i, x, idx, l, mid);
-    }
-    else{
-        setTree(tree, 2 * i + 1, x, idx, mid + 1, r);
-    }
-    tree[i] = tree[2 * i] + tree[2 * i + 1];
-    return;
-}
-
-long long getSum(long long* tree, int i, int t_l, int t_r, int l, int r){
-    if (l > r){
-        return 0;
-    }
-    if (t_l == l && t_r == r)
-    {
-        return tree[i];
-    }
-    int mid = (t_l + t_r) / 2;
-    return getSum(tree, 2 * i, t_l, mid, l, min(mid, r)) + getSum(tree, 2 * i + 1, mid + 1, t_r, max(l, mid + 1), r);
-}
-
-int main(){
-    long long* tree = (long long*)calloc(SIZE_TREE, sizeof(long long));
-    long long* a = (long long*)calloc(SIZE_ARR + 10, sizeof(long long));
-    long time = 0;
-    FILE* fp = fopen("segment.txt", "w");
-    for (int i = 0; i < N_TEST; i++)
-    {
-        for (int j = 0; j <= SIZE_ARR; j++)
-        {
-            a[j] = random() % 1000;
-        }
-        buildTree(a, tree, 1, 1, SIZE_ARR);
-
-        double startTime = getCPUTime();
-        for (int j = 0; j < SIZE_ARR; j++) {
-            char op = random() % 2;
-            if (op){
-                int l = rand() % (SIZE_ARR - 10);
-                l++;
-                int len = rand() % (SIZE_ARR - l - 2);
-                int r = l + len;
-                long long sum = getSum(tree, 1, 1, SIZE_ARR, l, r);
-            }
-            else
-            {
-                int x = rand() % 1000;
-                int idx = rand() % SIZE_ARR;
-                setTree(tree, 1, x, idx, 1, SIZE_ARR);
-            }
-        }
-        double endTime = getCPUTime();
-        fprintf(fp, "%lf\n", endTime - startTime);
-    }
-    fclose(fp);
-    free(a);
-    free(tree);
-}
+long long getSum(long long* tree, int i, int t_l, int t_r, int l, int r);
