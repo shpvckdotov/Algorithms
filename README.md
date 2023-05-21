@@ -1,4 +1,21 @@
-# Algorithms![intunsig](https://github.com/shpvckdotov/Algorithms/assets/126060577/ffbd9d0d-1cdb-4316-ae69-901c69546878)
+# Algorithms
+STR
+strlen -худшая хэш функция в мире
+strpolynom -чуть хуже strsum
+strsum- гораздо лучше strlen
+strcrc32 -Работает отлично
+
+INT
+intuns  - не совсем равномерно, т.к. коллизий больше чем у остальных
+intmod - работает стабильнее предыдущей, но все равно наблюдается неравномерность
+intmul лучше intmod,но хуже intmod
+
+FLOAT
+floatint - НЕРавномерно
+floatunsig - неравномерно с выбросами
+
+
+![intunsig](https://github.com/shpvckdotov/Algorithms/assets/126060577/ffbd9d0d-1cdb-4316-ae69-901c69546878)
 ![plot_float_int](https://github.com/shpvckdotov/Algorithms/assets/126060577/6a9ff007-a757-4cef-87f6-7cad609deb12)
 ![strcrc32](https://github.com/shpvckdotov/Algorithms/assets/126060577/0476d469-daaa-4a16-a5cb-2cd14d26d0cd)
 ![strlen](https://github.com/shpvckdotov/Algorithms/assets/126060577/c6a7a34f-d19f-451e-acde-9753d7d16b7e)
