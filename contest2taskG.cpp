@@ -1,31 +1,48 @@
-﻿#include <bits/stdc++.h>
+﻿#include <iostream>
+#include <vector>
+#include <unordered_map>
+#include <queue>
+#include <pair>
 #include <optional>
 
-using namespace std;
+#define MATRIX_SIZE 16
+#define DESK_CONST 4
+#define ON_DESK_POSITION_MASK 15ull
+#define ROTATE_VERTICAL 4
+#define ROTATE_HORIZONTAL 1
+#define FIRST_HEURISTIC_CONST 800
+#define SECOND_HEURISTIC_CONST 895
+#define DESK_POSITION_CONST 15
+#define SIZE_OF_DESK 16
+#define END_CONST 0xfedcba9876543210ull
+#define POSITION 15
+#define RESERVE_CONST 1000000
+#define LEFT 'L'
+#define RIGHT 'R'
+#define DOWN 'D'
+#define UP 'U'
+#define UNACHIEVABLE -1
 
-#define int int16_t
-
-const int kSize = 16;
 
 class Vertex {
 public:
     enum class Directions {
         Up, Down, Left, Right
     };
-    size_t matr[16];
-    explicit Vertex(size_t a) {
-        for (int i = 0; i < 4; ++i) {
-            for (int j = 0; j < 4; ++j) {
-                matr[i * 4 + j] = a & 15ull;
-                a >>= 4;
+    size_t desk_position[16];
+    explicit Vertex(size_t vertex) {
+        for (int16_t i = 0; i < DESK_CONST; ++i) {
+            for (int16_t j = 0; j < DESK_CONST; ++j) {
+                desk_position[i * DESK_CONST + j] = vertex & ON_DESK_POSITION_MASK;
+                vertex >>= DESK_CONST;
             }
         }
     }
 
-    int FindZero() {
-        int x;
-        for (int i = 0; i < kSize; ++i) {
-            if (matr[i] == 15) {
+    int16_t FindZero() {
+        int16_t x;
+        for (int16_t i = 0; i < MATRIX_SIZE; ++i) {
+            if (desk_position[i] == DESK_POSITION_CONST) {
                 x = i;
                 break;
             }
@@ -34,85 +51,85 @@ public:
     }
 
     std::optional<Vertex> GoUp() {
-        int index = FindZero();
-        if (index / 4 == 3) {
+        int16_t index = FindZero();
+        if (index / DESK_CONST == 3) {
             return std::nullopt;
         }
         Vertex temp = *this;
-        swap(temp.matr[index], temp.matr[index + 4]);
+        std::swap(temp.desk_position[index], temp.desk_position[index + ROTATE_VERTICAL]);
         return { temp };
     }
 
     std::optional<Vertex> GoDown() {
-        int index = FindZero();
-        if (index / 4 == 0) {
+        int16_t index = FindZero();
+        if (index / DESK_CONST == 0) {
             return std::nullopt;
         }
         Vertex temp = *this;
-        swap(temp.matr[index], temp.matr[index - 4]);
+        std::swap(temp.desk_position[index], temp.desk_position[index - ROTATE_VERTICAL]);
         return { temp };
     }
 
     std::optional<Vertex> GoLeft() {
-        int index = FindZero();
-        if (index % 4 == 3) {
+        int16_t index = FindZero();
+        if (index % DESK_CONST == 3) {
             return std::nullopt;
         }
         Vertex temp = *this;
-        swap(temp.matr[index], temp.matr[index + 1]);
+        std::swap(temp.desk_position[index], temp.desk_position[index + ROTATE_HORIZONTAL]);
         return { temp };
     }
 
     std::optional<Vertex> GoRight() {
-        int index = FindZero();
-        if (index % 4 == 0) {
+        int16_t index = FindZero();
+        if (index % DESK_CONST == 0) {
             return std::nullopt;
         }
         Vertex temp = *this;
-        swap(temp.matr[index], temp.matr[index - 1]);
+        std::swap(temp.desk_position[index], temp.desk_position[index - ROTATE_HORIZONTAL]);
         return { temp };
     }
 
 
     size_t Heuristic() {
         size_t res = 0;
-        for (int i = 0; i < 4; ++i) {
-            for (int j = 0; j < 4; ++j) {
-                if (matr[i * 4 + j] == 15) {
+        for (int16_t i = 0; i < DESK_CONST; ++i) {
+            for (int16_t j = 0; j < DESK_CONST; ++j) {
+                if (desk_position[i * DESK_CONST + j] == DESK_POSITION_CONST) {
                     continue;
                 }
-                int usual_x = (matr[i * 4 + j]) / 4;
-                int usual_y = (matr[i * 4 + j]) % 4;
+                int16_t usual_x = (desk_position[i * DESK_CONST + j]) / DESK_CONST;
+                int16_t usual_y = (desk_position[i * DESK_CONST + j]) % DESK_CONST;
                 res += abs(i - usual_x) + abs(j - usual_y);
             }
         }
-        for (int line = 0; line < 4; ++line) {
-            for (int l = 0; l < 3; ++l) {
-                for (int r = l + 1; r < 4; ++r) {
-                    if (matr[line * 4 + l] / 4 == line && matr[line * 4 + r] / 4 == line &&
-                        matr[line * 4 + l] > matr[line * 4 + r] &&
-                        ((matr[line * 4 + l] | matr[line * 4 + r]) ^ 15)) {
+        for (int16_t line = 0; line < DESK_CONST; ++line) {
+            for (int16_t l = 0; l < 3; ++l) {
+                for (int16_t r = l + 1; r < DESK_CONST; ++r) {
+                    if (desk_position[line * DESK_CONST + l] / 4 == line && desk_position[line * DESK_CONST + r] / DESK_CONST == line &&
+                        desk_position[line * DESK_CONST + l] > desk_position[line * DESK_CONST + r] &&
+                        ((desk_position[line * DESK_CONST + l] | desk_position[line * DESK_CONST + r]) ^ ON_DESK_POSITION_MASK)) {
                         res += 2;
                     }
                 }
             }
         }
-        for (int row = 0; row < 4; ++row) {
-            for (int l = 0; l < 3; ++l) {
-                for (int r = l + 1; r < 4; ++r) {
-                    if (matr[l * 4 + row] % 4 == row && matr[r + row % 4] % 4 == row &&
-                        matr[l * 4 + row] > matr[r * 4 + row] &&
-                        ((matr[l * 4 + row] | matr[r * 4 + row]) ^ 15)) {
+        for (int16_t row = 0; row < DESK_CONST; ++row) {
+            for (int16_t l = 0; l < 3; ++l) {
+                for (int16_t r = l + 1; r < DESK_CONST; ++r) {
+                    if (desk_position[l * DESK_CONST + row] % 4 == row && desk_position[r + row % DESK_CONST] % DESK_CONST == row &&
+                        desk_position[l * DESK_CONST + row] > desk_position[r * DESK_CONST + row] &&
+                        ((desk_position[l * DESK_CONST + row] | desk_position[r * DESK_CONST + row]) ^ ON_DESK_POSITION_MASK)) {
                         res += 2;
                     }
                 }
             }
         }
-        return (res * 895) / 800;
+        return (res * SECOND_HEURISTIC_CONST) / FIRST_HEURISTIC_CONST;
     }
 
     vector<pair<size_t, Directions>> FindNext() {
-        vector<pair<size_t, Directions>> ans;
+        std::vector<pair<size_t, Directions>> ans;
         std::optional<Vertex> up_ans = GoUp();
         if (up_ans != nullopt) {
             ans.push_back(make_pair(up_ans.value().to_int(), Directions::Up));
@@ -138,9 +155,9 @@ public:
 
     size_t to_int() {
         size_t res = 0;
-        for (int i = 0; i < 4; ++i) {
-            for (int j = 0; j < 4; ++j) {
-                res |= matr[i * 4 + j] * 1ull << (i * 4 + j) * 4;
+        for (int16_t i = 0; i < DESK_CONST; ++i) {
+            for (int16_t j = 0; j < DESK_CONST; ++j) {
+                res |= desk_position[i * DESK_CONST + j] * 1ull << (i * DESK_CONST + j) * DESK_CONST;
             }
         }
         return res;
@@ -148,97 +165,97 @@ public:
 };
 
 bool Check(vector<size_t>& start) {
-    int inv = 0;
-    for (int i = 0; i < 16; ++i)
-        if (start[i] != 15)
-            for (int j = 0; j < i; ++j)
-                if (start[j] > start[i] && start[j] != 15)
+    int16_t inv = 0;
+    for (int16_t i = 0; i < SIZE_OF_DESK; ++i)
+        if (start[i] != POSITION)
+            for (int16_t j = 0; j < i; ++j)
+                if (start[j] > start[i] && start[j] != POSITION)
                     ++inv;
-    for (int i = 0; i < 16; ++i)
-        if (start[i] == 15)
-            inv += 1 + i / 4;
+    for (int16_t i = 0; i < SIZE_OF_DESK; ++i)
+        if (start[i] == POSITION)
+            inv += 1 + i / DESK_CONST;
 
     return inv % 2 == 0;
 }
 
-void AStar(size_t start, size_t end, unordered_map<size_t, size_t>& g,
-    unordered_map<size_t, size_t>& parents) {
-    priority_queue<pair<size_t, size_t>, std::vector<pair<size_t, size_t>>, greater<>> q;
-    g.insert(pair<size_t, size_t>(start, 0));
-    q.push({ Vertex(start).Heuristic(), start });
-    while (!q.empty()) {
-        size_t tmp = q.top().second;
-        q.pop();
+void AStar(size_t start, size_t end, unordered_map<size_t, size_t>& function_for_heuristic,
+    std::unordered_map<size_t, size_t>& parents) {
+    std::priority_queue<std::pair<size_t, size_t>, std::vector<std::pair<size_t, size_t>>, greater<>> binary_heap_for_Astar;
+    function_for_heuristic.insert(pair<size_t, size_t>(start, 0));
+    binary_heap_for_Astar.push({ Vertex(start).Heuristic(), start });
+    while (!binary_heap_for_Astar.empty()) {
+        size_t tmp = binary_heap_for_Astar.top().second;
+        binary_heap_for_Astar.pop();
         if (tmp == end) {
             return;
         }
-        vector<pair<size_t, Vertex::Directions>> next_direcitons = Vertex(tmp).FindNext();
-        size_t dist = g[tmp];
-        for (auto v : next_direcitons) {
+        std::vector<pair<size_t, Vertex::Directions>> next_direcitons = Vertex(tmp).FindNext();
+        size_t dist = function_for_heuristic[tmp];
+        for (auto directions : next_direcitons) {
             size_t next_weight = dist + 1;
-            if (g.find(v.first) == g.end() || next_weight < g[v.first]) {
-                parents[v.first] = tmp;
-                g[v.first] = next_weight;
-                q.push({ next_weight + Vertex(v.first).Heuristic(), v.first });
+            if (function_for_heuristic.find(directions.first) == function_for_heuristic.end() || next_weight < function_for_heuristic[directions.first]) {
+                parents[directions.first] = tmp;
+                function_for_heuristic[directions.first] = next_weight;
+                binary_heap_for_Astar.push({ next_weight + Vertex(directions.first).Heuristic(), directions.first });
             }
         }
     }
 }
 
 void PrintAns(size_t start, size_t end,
-    unordered_map<size_t, size_t>& parents) {
-    vector<Vertex::Directions> ans;
+    std::unordered_map<size_t, size_t>& parents) {
+    std::vector<Vertex::Directions> ans;
     size_t tmp = end;
     while (tmp != start) {
         size_t prev = parents[tmp];
-        vector<pair<size_t, Vertex::Directions>> next_direcitons = Vertex(tmp).FindNext();
-        for (auto v : next_direcitons) {
-            if (v.first == prev) {
-                ans.push_back(v.second);
+        std::vector<pair<size_t, Vertex::Directions>> next_direcitons = Vertex(tmp).FindNext();
+        for (auto directions : next_direcitons) {
+            if (directions.first == prev) {
+                ans.push_back(directions.second);
                 break;
             }
         }
         tmp = prev;
     }
-    cout << ans.size() << '\n';
+    std::cout << ans.size() << '\n';
     std::reverse(ans.begin(), ans.end());
     for (size_t i = 0; i < ans.size(); ++i) {
         if (ans[i] == Vertex::Directions::Up) {
-            cout << 'D';
+            std::cout << DOWN;
         }
         else if (ans[i] == Vertex::Directions::Down) {
-            cout << 'U';
+            std::cout << UP;
         }
         else if (ans[i] == Vertex::Directions::Left) {
-            cout << 'R';
+            std::cout << RIGHT;
         }
         else if (ans[i] == Vertex::Directions::Right) {
-            cout << 'L';
+            std::cout << LEFT;
         }
     }
 }
 
 signed main() {
-    cin.tie(0);
-    ios_base::sync_with_stdio(false);
-    vector<size_t> matrix(kSize);
+    std::cin.tie(0);
+    std::ios_base::sync_with_stdio(false);
+    std::vector<size_t> matrix(MATRIX_SIZE);
     size_t start = 0;
-    for (size_t i = 0; i < kSize; ++i) {
+    for (size_t i = 0; i < MATRIX_SIZE; ++i) {
         cin >> matrix[i];
-        if (matrix[i] == 0) matrix[i] = 15;
+        if (matrix[i] == 0) matrix[i] = POSITION;
         else --matrix[i];
-        start |= matrix[i] << i * 4;
+        start |= matrix[i] << i * DESK_CONST;
     }
     if (!Check(matrix)) {
-        cout << -1;
+        cout << UNACHIEVABLE;
         return 0;
     }
-    size_t end = 0xfedcba9876543210ull;
-    unordered_map<size_t, size_t> g;
-    unordered_map<size_t, size_t> parents;
-    g.reserve(1000000);
-    parents.reserve(1000000);
-    AStar(start, end, g, parents);
+    size_t end = END_CONST;
+    std::unordered_map<size_t, size_t> function_for_heuristic;
+    std::unordered_map<size_t, size_t> parents;
+    function_for_heuristic.reserve(RESERVE_CONST);
+    parents.reserve(RESERVE_CONST);
+    AStar(start, end, function_for_heuristic, parents);
     PrintAns(start, end, parents);
     return 0;
 }
