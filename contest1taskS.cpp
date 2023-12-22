@@ -43,11 +43,7 @@ void count_profiles(const std::vector<std::vector<bool>>& bool_table, std::vecto
     }
 }
 
-int main() {
-    size_t length;
-    size_t width;
-    size_t mod;
-    std::cin >> length >> width >> mod;
+size_t consistent_distributions_counting(size_t length, size_t width) {
     if (length < width) {
         std::swap(length, width);
     }
@@ -59,5 +55,11 @@ int main() {
         cnt_profiles[0][i] = 1;
     }
     count_profiles(bool_table, cnt_profiles, length, num_of_masks);
-    std::cout << generate_ans(cnt_profiles, length, num_of_masks) % mod ;
+    return generate_ans(cnt_profiles, length, num_of_masks) % mod;
+}
+
+int main() {
+    size_t length, width, mod;
+    std::cin >> length >> width >> mod;
+    cout << consistent_distributions_counting(length, width);
 }
