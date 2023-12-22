@@ -19,26 +19,26 @@ std::vector <std::vector<size_t>> multiply_matrix(std::vector <std::vector<size_
 	return matrix;
 }
 
-size_t pow_matrix(size_t deg,const std::vector<size_t>& base_vector) {
+size_t pow_matrix(size_t degree,const std::vector<size_t>& base_vector) {
 	std::vector <std::vector<size_t>> base = _BASE_MATRIX_;
-	std::vector <std::vector<size_t>> res = _BASE_MATRIX_;
-	while (deg) {
-		if (deg % _DEGREE_CONST_ == 0) {
-			deg /= _DEGREE_CONST_;
+	std::vector <std::vector<size_t>> matrix_mult = _BASE_MATRIX_;
+	while (degree) {
+		if (degree % _DEGREE_CONST_ == 0) {
+			degree /= _DEGREE_CONST_;
 			base = multiply_matrix(base, base);
 		}
 		else {
-			deg--;
-			res = multiply_matrix(res, base);
+			degree--;
+			matrix_mult = multiply_matrix(matrix_mult, base);
 		}
 	}
-	size_t answer = 0;
-	size_t i = 0;
-	while (i < _MATRIX_SIZE_) {
-		answer += (res[1][i] * base_vector[i]) % _MOD_;
-		i++;
+	size_t ways_count = 0;
+	size_t matrix_iteration = 0;
+	while (matrix_iteration < _MATRIX_SIZE_) {
+		ways_count += (matrix_mult[1][matrix_iteration] * base_vector[matrix_iteration]) % _MOD_;
+		matrix_iteration++;
 	}
-	return answer;
+	return ways_count;
 }
 
 int main() {
