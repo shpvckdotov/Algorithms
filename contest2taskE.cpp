@@ -65,10 +65,6 @@ int main() {
 	std::vector<size_t> vertex_enter_time(n + 1, 0), vertex_time_out(n + 1, 0), tree_return_time(n + 1, INF), std::vector<size_t> parents(n + 1, 0);
 	std::set<size_t> bridges;
 	graph_initiation(graph);
-	for (size_t i = 1; i <= n; i++) {
-		if (!used_vertexes[i]) {
-			dfs(graph, used_vertexes, tree_return_time, vertex_enter_time, vertex_time_out, parents, bridges, i);
-		}
-	}
+	answer_building(graph, used_vertexes, tree_return_time, vertex_enter_time, vertex_time_out, parents, bridges, i);
 	answer_printing(bridges);
 }
