@@ -235,11 +235,7 @@ void PrintAns(size_t start, size_t end,
     }
 }
 
-signed main() {
-    std::cin.tie(0);
-    std::ios_base::sync_with_stdio(false);
-    std::vector<size_t> matrix(MATRIX_SIZE);
-    size_t start = 0;
+void achievability_check(std::vector<size_t>& matrix,size_t& start, size_t& end) {
     for (size_t i = 0; i < MATRIX_SIZE; ++i) {
         cin >> matrix[i];
         if (matrix[i] == 0) matrix[i] = POSITION;
@@ -251,6 +247,15 @@ signed main() {
         return 0;
     }
     size_t end = END_CONST;
+}
+
+signed main() {
+    std::cin.tie(0);
+    std::ios_base::sync_with_stdio(false);
+    std::vector<size_t> matrix(MATRIX_SIZE);
+    size_t start = 0;
+    size_t end;
+    achievability_check(matrix, start, end);
     std::unordered_map<size_t, size_t> function_for_heuristic;
     std::unordered_map<size_t, size_t> parents;
     function_for_heuristic.reserve(RESERVE_CONST);
