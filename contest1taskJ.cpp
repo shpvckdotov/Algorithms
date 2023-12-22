@@ -3,9 +3,9 @@
 #include <algorithm>
 #include <string>
 
-void dp_filling(const std::string& first, const std::string& second,
+void longest_matching_subsequences_filling(const std::string& first, const std::string& second,
 	std::vector<size_t>& first_string_len, std::vector<size_t>& second_string_len,
-	std::vector<std::vector<bool>>& dp)
+	std::vector<std::vector<bool>>& longest_matching_subsequences)
 	{
 	for (size_t i = 0; i < first.size(); i++) {
 		second_string_len.assign(second.size() + 1, 0);
@@ -19,7 +19,7 @@ void dp_filling(const std::string& first, const std::string& second,
 				}
 				else {
 					second_string_len[j + 1] = first_string_len[j + 1];
-					dp[i + 1][j + 1] = 1;
+					longest_matching_subsequences[i + 1][j + 1] = 1;
 				}
 			}
 		}
@@ -28,24 +28,24 @@ void dp_filling(const std::string& first, const std::string& second,
 }
 
 void answer_building(const std::string& first, const std::string& second,
-	const std::vector<std::vector<bool>>& dp,
+	const std::vector<std::vector<bool>>& longest_matching_subsequences,
 	std::vector<size_t>& first_string_indexes, std::vector<size_t>& second_string_indexes) {
-	int i = first.size() - 1;
-	int j = second.size() - 1;
-	while (i >= 0 && j >= 0) {
-		if (first[i] == second[j]) {
-			first_string_indexes.push_back(i + 1);
-			second_string_indexes.push_back(j + 1);
+	int iteration_on_first_string = first.size() - 1;
+	int iteration_on_second_string = second.size() - 1;
+	while (iteration_on_first_string >= 0 && iteration_on_second_string >= 0) {
+		if (first[iteration_on_first_string] == second[iteration_on_second_string]) {
+			first_string_indexes.push_back(iteration_on_first_string + 1);
+			second_string_indexes.push_back(iteration_on_second_string + 1);
 			i--;
-			j--;
+			iteration_on_second_string--;
 			continue;
 		}
 		else {
-			if (dp[i + 1][j + 1]) {
-				i--;
+			if (longest_matching_subsequences[iteration_on_first_string + 1][iteration_on_second_string + 1]) {
+				iteration_on_first_string--;
 			}
 			else {
-				j--;
+				iteration_on_second_string--;
 			}
 		}
 	}
@@ -71,9 +71,9 @@ int main() {
 	std::vector<size_t> first_string_len, second_string_len;
 	std::vector<size_t> first_string_indexes, second_string_indexes;
 	std::cin >> first >> second;
-	std::vector<std::vector<bool>> dp(first.size() + 1, std::vector<bool>(second.size() + 1, false));
+	std::vector<std::vector<bool>> longest_matching_subsequences(first.size() + 1, std::vector<bool>(second.size() + 1, false));
 	first_string_len.resize(second.size() + 1);
-	dp_filling(first, second, first_string_len, second_string_len, dp);
-	answer_building(first, second, dp, first_string_indexes, second_string_indexes);
+	longest_matching_subsequences_filling(first, second, first_string_len, second_string_len, longest_matching_subsequences);
+	answer_building(first, second, longest_matching_subsequences, first_string_indexes, second_string_indexes);
 	answer_printing(first_string_indexes, second_string_indexes);
 }
